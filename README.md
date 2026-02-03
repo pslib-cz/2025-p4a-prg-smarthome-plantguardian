@@ -51,7 +51,7 @@ Teplota není měřena přímo na RPi (kvůli ovlivnění teplem procesoru), ale
 
 ### 3. The Brain (LLM Logic)
 
-`OpenAI GPT-4o` dostává kontextová data složená z:
+`Gemini 3 Flash` dostává kontextová data složená z:
 
 * **Vizuálu:** Snapshot z kamery.
 * **Senzoriky:** Aktuální teplota a vlhkost z ESP32.
