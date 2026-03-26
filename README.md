@@ -115,5 +115,4 @@ Jednoduché rozhraní běžící na `http://rpi-ip:8123/dashboard-chat`.
 
 ---
 
-*Projekt vytvořen pro předmět Internet věcí (IoT).*
-*Autoři: [Tvé Jméno], [Jméno Spolužáka]*
+*Autoři: Antonín Reiser a Štěpán Prchal
