@@ -1,85 +1,171 @@
-# 🌿 PlantGuardian - Smart Grow Box
+# 🌿 PlantGuardian — Smart Grow Box
 
-Jedná se o chytrý, autonomní box pro dohled a péči o rostlinu. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů.
-
----
-
-## ✨ Funkce a scénáře (Případová studie)
-
-1. **🌡️ Automatické mikroklima (Dynamické chlazení):** 
-   - Systém monitoruje teplotu a vlhkost pomocí DHT22.
-   - Při překročení stanovené meze je pomocí MOSFET tranzistoru plynule spuštěn 120mm ventilátor pro odsávání vzduchu. (lepší než relé protože pwm) 
-2. **💧 Inteligentní závlaha / Fyzická klapka:**
-   - Na základě pokynu z webového dashboardu nebo fyzického tlačítka se otočí servo, který uvolní ventil/otevře střešní klapku/něco prostě bude dělat.
-3. **🚨 Bezpečnostní Alarm a Override:**
-   - Senzor otevření víka (reed sw) hlídá neoprávněný přístup. Pokud dojde k narušení, spustí se akustický alarm (bzučák) a na LCD displeji začne blikat varování.
-   - tlačitko okamžitě ztlumí poplach a zapne maintenance mód (kterej nevim co ještě bude pořádně dělat ale je to integrace).
+Chytrý, autonomní box pro dohled a péči o rostlinu. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů. Komunikace probíhá přes ESPHome API a MQTT; webový klient (dashboard) se připojuje přes MQTT WebSockets se zabezpečením TLS/SSL.
 
 ---
 
-## 🛠️ Použitý HW
+## ✨ Scénáře automatizace
 
-### 🧠 Centrální jednotka a Komunikace
-* **Raspberry Pi 4B** + MicroSD karta (Hostuje Home Assistant OS a MQTT Broker)
-* **ESP32 WROOM-32** (Sběr dat a řízení HW přes ESPHome)
-* **USB Webkamera Sandberg Webcam Wide Angle 1080P HD** (Lokální videostream)
+### 1. 🌡️ Automatické mikroklima
+Systém monitoruje teplotu a vlhkost uvnitř boxu pomocí senzoru **DHT22**. Při překročení nastavitelného teplotního prahu se plynule rozbíhá 120mm ventilátor řízený přes **MOSFET (PWM)**. Čím vyšší teplota, tím vyšší otáčky — lineární regulace, ne pouhé zapnutí/vypnutí. Práh lze nastavit fyzicky otočným enkodérem přímo na krabici nebo z webového dashboardu.
 
-### 📡 Senzory (Vstupy)
-* **DHT22** - Senzor teploty a vlhkosti vzduchu
-* **KY-025 Reed switch** - Maintenance mód - otevření boxu
-* **Spínací tlačítko (Push button)** - Fyzický zásah do systému (Manual override) !!!! TOHLE JE NĚJAKÝ DIVNÝ
+### 2. 🔧 Manuální ovládání klapky / ventilu
+Servo motor ovládá mechanickou klapku (střešní ventilaci nebo ventil). Aktivace probíhá z webového dashboardu nebo fyzickým tlačítkem na krabici. Slouží jako manuální zásah do ventilace nebo budoucí příprava pro závlahový systém (s doplněním senzoru vlhkosti půdy).
 
-### ⚙️ Akční členy (Výstupy)
-* **120mm Cooler Master větríl** (Aktivní odvětrávání)
-* **Servo motor SM-S2309S** (Mechanická klapka)
-* **RGB LED pásek (3M)** (Osvětlení pro růst rostliny)
-* **Piezo Bzučák** (Akustická signalizace)
-* **LCD Displej LCM1602C** (Lokální zobrazení stavu)
+### 3. 🚨 Bezpečnostní systém
+Víceúrovňový alarm hlídající stav boxu:
+- **Reed switch modul (KY-025)** — magnet na víku, modul na těle krabice. Otevření víka spustí alarm.
+- **Flame sensor** — detekce ohně v blízkosti boxu (relevantní kvůli 12V elektronice a napájecímu zdroji).
+- **Rtuťový nakláněcí spínač** — detekce převrácení nebo silného náklonu krabice.
+- Při narušení se spustí **pasivní bzučák** (různé tóny pro různé typy alarmu) a na **LCD displeji** bliká varování.
+- **Fyzické tlačítko** slouží jako Manual Override — okamžité ztlumení alarmu a přepnutí do servisního režimu.
+
+### 4. 💡 Automatické osvětlení
+Senzor intenzity světla (**Light blocking modul**) měří osvětlení uvnitř boxu. Pokud hladina klesne pod nastavený práh (např. zatažená obloha, večer), systém automaticky zapne **RGB LED pásek** přes relé. Osvětlení simuluje dostatečný světelný příkon pro růst rostliny.
+
+---
+
+## 🛠️ Použitý hardware
+
+### 🧠 Centrální jednotka
+| Komponenta | Funkce |
+|---|---|
+| **Raspberry Pi 4B** + MicroSD | Home Assistant OS, Mosquitto MQTT Broker |
+| **ESP32 WROOM-32** | Sběr dat ze senzorů, řízení akčních členů (ESPHome) |
+| **Sandberg USB Webcam Wide Angle 1080P HD** | Lokální video stream (MotionEye → Generic Camera) |
+
+### 📡 Senzory (vstupy)
+| Komponenta | Funkce | Rozhraní |
+|---|---|---|
+| **DHT22** | Teplota a vlhkost vzduchu | Digitální (GPIO) |
+| **KY-025 Reed Switch modul** | Detekce otevření víka boxu | Digitální (D0 → GPIO) |
+| **Flame sensor modul** | Detekce ohně / plamene | Digitální (GPIO) |
+| **Rtuťový nakláněcí spínač** | Detekce převrácení boxu | Digitální (GPIO) |
+| **Light blocking modul** | Měření intenzity světla | Analogový (ADC) / Digitální |
+| **Rotary encoder** | Fyzické nastavení teplotního prahu | Digitální (GPIO — CLK, DT, SW) |
+| **Push button** | Manual override / servisní režim | Digitální (GPIO) |
+
+### ⚙️ Akční členy (výstupy)
+| Komponenta | Funkce | Řízení |
+|---|---|---|
+| **120mm Cooler Master ventilátor** | Aktivní odvětrávání boxu | MOSFET PWM (12V) |
+| **Servo motor SM-S2309S** | Mechanická klapka / ventil | PWM signál (5V) |
+| **RGB LED pásek (12V, 3M)** | Osvětlení pro růst rostliny | Relé on/off (12V) |
+| **Pasivní bzučák** | Akustická signalizace (více tónů) | PWM (3.3V) |
+| **LCD displej LCM1602C** | Lokální zobrazení stavu a varování | I²C / paralelně (5V) |
 
 ### 🔌 Silová a propojovací elektronika
-* **MOSFET IRF520** (Spínání 12V větve pro ventilátor)
-* **Relé modul SRD-05VDC-SL-C** (Spínání 12V větve pro LED pásek - ale ten podle mě nepotřebuje 12V. nějak zjistit)
-* **Potenciometr Bochen 3296** (Řízení kontrastu LCD displeje)
-* **Breadboard a propojky a kabely a duponty a hodně věcí**
-* **Externí napájecí adaptér 12V** (Pro napájení ventilátoru a osvětlení)
+| Komponenta | Funkce |
+|---|---|
+| **MOSFET IRF520** | Spínání 12V větve pro ventilátor (PWM regulace) |
+| **Relé modul SRD-05VDC-SL-C** | Spínání 12V větve pro LED pásek |
+| **Potenciometr Bochen 3296** | Nastavení kontrastu LCD displeje |
+| **Breadboard, propojky, DuPont kabely** | Prototypové zapojení |
+| **Externí napájecí adaptér 12V** | Napájení ventilátoru a LED pásku |
 
 ---
 
-## 🏗️ Architektura a zapojení
+## 🏗️ Architektura systému
 
-Systém využívá dvouúrovňovou architekturu:
-1. **Logická vrstva (5V/3.3V):** RPi a ESP32 řídí logiku. Senzory a LCD běží na této nízkonapěťové větvi. Data putují přes lokální Wi-Fi sít do Home Assistanta (protokol ESPHome API a MQTT).
-2. **Výkonová vrstva (12V):** Protože RPi a ESP32 nedokážou napájet výkonné členy, je zde oddělený 12V okruh ovládaný skrze MOSFET (PWM regulace) a Relé (binární on/off). Obě vrstvy sdílejí **společnou zem (GND)**.
+```
+┌─────────────────────────────────────────────────────┐
+│                  Raspberry Pi 4B                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────┐   │
+│  │ Home     │  │ Mosquitto│  │ MotionEye        │   │
+│  │ Assistant│  │ MQTT     │  │ (USB kamera)     │   │
+│  └────┬─────┘  └────┬─────┘  └──────────────────┘   │
+│       │ ESPHome API  │ MQTT                          │
+└───────┼──────────────┼───────────────────────────────┘
+        │    Wi-Fi     │
+┌───────┼──────────────┼───────────────────────────────┐
+│       ▼              ▼          ESP32 WROOM-32       │
+│  ┌─────────────────────────────────────────────┐     │
+│  │              GPIO / ADC / PWM / I²C         │     │
+│  └──┬──────┬──────┬──────┬──────┬──────┬───────┘     │
+│     │      │      │      │      │      │             │
+│  DHT22  KY-025  Flame  Hg-SW  Light  Encoder        │
+│         Reed          tilt   block   + Button        │
+│                                                      │
+│  ┌─────────────────────────────────────────────┐     │
+│  │            Výstupy (PWM / GPIO)             │     │
+│  └──┬──────┬──────┬──────┬─────────────────────┘     │
+│     │      │      │      │                           │
+│  MOSFET  Relé   Servo  Buzzer  LCD                   │
+│  (Fan)  (LED)  (Klapka) (Alarm) (Status)             │
+└──────────────────────────────────────────────────────┘
+        │              │
+   ┌────┴────┐    ┌────┴────┐
+   │  12V    │    │  12V    │
+   │  Fan    │    │  LED    │
+   └─────────┘    └─────────┘
+   Společná zem (GND) mezi 3.3V/5V a 12V větvemi
+```
+
+**Logická vrstva (3.3V / 5V):** ESP32 čte senzory a řídí logiku. Komunikuje s HA přes Wi-Fi (ESPHome API + MQTT).
+
+**Výkonová vrstva (12V):** Oddělený napájecí okruh pro ventilátor (MOSFET, PWM regulace) a LED pásek (relé, binární on/off). Obě vrstvy sdílejí společnou zem.
+
+---
+
+## 📊 Přehled entit a integrací
+
+### Lokální integrace
+| Integrace | Účel |
+|---|---|
+| **ESPHome** | Komunikace s ESP32, konfigurace senzorů a akčních členů |
+| **MQTT (Mosquitto)** | Přenos dat pro webový dashboard (WebSockets) |
+| **Generic Camera** | Video stream z USB kamery přes MotionEye |
+
+### Seznam entit
+| Entita | Typ | Scénář |
+|---|---|---|
+| `sensor.temperature` | Senzor | 1 — Mikroklima |
+| `sensor.humidity` | Senzor | 1 — Mikroklima |
+| `sensor.light_level` | Senzor | 4 — Osvětlení |
+| `binary_sensor.box_lid` | Binární senzor | 3 — Bezpečnost |
+| `binary_sensor.flame` | Binární senzor | 3 — Bezpečnost |
+| `binary_sensor.tilt` | Binární senzor | 3 — Bezpečnost |
+| `binary_sensor.override_button` | Binární senzor | 3 — Bezpečnost |
+| `sensor.temp_threshold` | Senzor | 1 — Mikroklima |
+| `fan.ventilator` | Akční člen | 1 — Mikroklima |
+| `switch.led_strip` | Akční člen | 4 — Osvětlení |
+| `switch.servo_flap` | Akční člen | 2 — Klapka |
+| `switch.buzzer` | Akční člen | 3 — Bezpečnost |
+| `camera.plantguardian_cam` | Kamera | Monitoring |
 
 ---
 
 ## 📋 Implementační plán
 
-Vývoj projektu je rozdělen do 4 logických fází:
+### Fáze 1: Infrastruktura ✅
+- [x] Instalace Home Assistant OS na Raspberry Pi
+- [x] Zprovoznění lokální sítě (RPi ethernet + Wi-Fi pro ESP32)
+- [x] Instalace doplňků: Mosquitto broker, ESPHome, File editor
+- [x] Integrace USB kamery (MotionEye → Generic Camera)
+- [x] Nastavení Git repozitáře
 
-### Fáze 1: Založení infrastruktury
-- [x] Instalace Home Assistant OS na Raspberry Pi.
-- [ ] Zprovoznění lokální Wi-Fi komunikace.
-- [x] Instalace doplňků: Mosquitto broker (MQTT), ESPHome, File editor.
-- [x] Integrace USB kamery přes *Generic Camera* integraci.
-
-### Fáze 2: Sběr dat a nízkonapěťové obvody
-- [ ] Zapojení a konfigurace ESP32 na breadboardu.
-- [ ] Připojení DHT22, JB spínače a tlačítka JB k ESP32.
-- [ ] Zápis `yaml` kódu do ESPHome a ověření čtení hodnot v HA.
-- [ ] Zapojení a konfigurace Piezo bzučáku pro alarm.
+### Fáze 2: Senzory a nízkonapěťové obvody
+- [ ] Zapojení a konfigurace ESP32 na breadboardu
+- [ ] Připojení DHT22 — ověření čtení teploty a vlhkosti v HA
+- [ ] Připojení KY-025 reed switch modulu — detekce otevření víka
+- [ ] Připojení flame sensoru, Hg spínače, light blocking modulu
+- [ ] Připojení rotary encoderu a push buttonu
+- [ ] Konfigurace pasivního bzučáku (PWM tóny)
+- [ ] Zápis ESPHome YAML a ověření všech entit v HA
 
 ### Fáze 3: Výkonová elektronika a akční členy
-- [ ] Zapojení sdíleného GND a 12V adaptéru.
-- [ ] Integrace MOSFETu IRF520 pro řízení Cooler Master ventilátoru (nastavení PWM v ESPHome).
-- [ ] Integrace Relé pro ovládání RGB LED pásku.
-- [ ] Konfigurace servomotoru.
+- [ ] Zapojení sdíleného GND a 12V napájecího adaptéru
+- [ ] MOSFET IRF520 — PWM řízení ventilátoru
+- [ ] Relé modul — spínání RGB LED pásku
+- [ ] Servo motor — mechanická klapka
+- [ ] Konfigurace automatizací v HA (pravidla pro scénáře 1–4)
 
-### Fáze 4: Dashboard, Zabezpečení a Prezentace
-- [ ] Zapojení LCD displeje LCM1602C s potenciometrem Bochen pro lokální výpis logů.
-- [ ] Vytvoření vlastního webového klienta (HTML/JS/CSS).
-- [ ] Napojení klienta na MQTT přes WebSockets.
-- [ ] Zabezpečení komunikace a implementace TLS/SSL autorizace.
-- [ ] Zabalení a montáž do finální fyzické krabice.
+### Fáze 4: Dashboard, zabezpečení a finalizace
+- [ ] Zapojení LCD displeje LCM1602C s potenciometrem
+- [ ] Vytvoření vlastního webového klienta (HTML/JS/CSS)
+- [ ] Napojení klienta na MQTT přes WebSockets
+- [ ] Zabezpečení komunikace (self-signed TLS/SSL certifikát)
+- [ ] Autorizace přístupu k dashboardu
+- [ ] Montáž do finální krabice
 
 ---
