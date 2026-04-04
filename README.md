@@ -26,7 +26,7 @@ Projekt je sestaven převážně z recyklovaných a běžně dostupných elektro
 ### 🧠 Centrální jednotka a Komunikace
 * **Raspberry Pi 4B** + MicroSD karta (Hostuje Home Assistant OS a MQTT Broker)
 * **ESP32 WROOM-32** (Sběr dat a řízení HW přes ESPHome)
-* **USB Webkamera Logitech C270** (Lokální videostream)
+* **USB Webkamera sandberg nejaka nevim** (Lokální videostream)
 
 ### 📡 Senzory (Vstupy)
 * **DHT22** - Senzor teploty a vlhkosti vzduchu
