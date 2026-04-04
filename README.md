@@ -1,40 +1,36 @@
 # 🌿 PlantGuardian - Smart Grow Box
 
-Jedná se o chytrý, autonomní box pro dohled a péči o rostlinu/skleník. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů.
+Jedná se o chytrý, autonomní box pro dohled a péči o rostlinu. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů.
 
 ---
 
-## ✨ Funkce a Scénáře (Případová studie)
-
-Projekt obsahuje tři hlavní automatizační scénáře, které simulují reálné chování chytrého spotřebiče:
+## ✨ Funkce a scénáře (Případová studie)
 
 1. **🌡️ Automatické mikroklima (Dynamické chlazení):** 
-   - Systém monitoruje teplotu a vlhkost pomocí senzoru DHT22.
-   - Při překročení stanovené meze je pomocí PWM signálu a MOSFET tranzistoru plynule spuštěn 120mm ventilátor pro odsávání vzduchu.
+   - Systém monitoruje teplotu a vlhkost pomocí DHT22.
+   - Při překročení stanovené meze je pomocí MOSFET tranzistoru plynule spuštěn 120mm ventilátor pro odsávání vzduchu. (lepší než relé protože pwm) 
 2. **💧 Inteligentní závlaha / Fyzická klapka:**
-   - Na základě pokynu z webového dashboardu nebo fyzického tlačítka se otočí servo motor, který uvolní ventil/otevře střešní klapku.
+   - Na základě pokynu z webového dashboardu nebo fyzického tlačítka se otočí servo, který uvolní ventil/otevře střešní klapku/něco prostě bude dělat.
 3. **🚨 Bezpečnostní Alarm a Override:**
-   - Senzor otevření víka (mikrospínač) hlídá neoprávněný přístup. Pokud dojde k narušení, spustí se akustický alarm (bzučák) a na LCD displeji začne blikat varování.
-   - Lokální fyzické tlačítko slouží jako *Manual Override* pro okamžité ztlumení poplachu nebo ruční spuštění ventilace.
+   - Senzor otevření víka (reed sw) hlídá neoprávněný přístup. Pokud dojde k narušení, spustí se akustický alarm (bzučák) a na LCD displeji začne blikat varování.
+   - tlačitko okamžitě ztlumí poplach a zapne maintenance mód (kterej nevim co ještě bude pořádně dělat ale je to integrace).
 
 ---
 
-## 🛠️ Použitý Hardware
-
-Projekt je sestaven převážně z recyklovaných a běžně dostupných elektronických součástek.
+## 🛠️ Použitý HW
 
 ### 🧠 Centrální jednotka a Komunikace
 * **Raspberry Pi 4B** + MicroSD karta (Hostuje Home Assistant OS a MQTT Broker)
 * **ESP32 WROOM-32** (Sběr dat a řízení HW přes ESPHome)
-* **USB Webkamera sandberg nejaka nevim** (Lokální videostream)
+* **USB Webkamera Sandberg Webcam Wide Angle 1080P HD** (Lokální videostream)
 
 ### 📡 Senzory (Vstupy)
 * **DHT22** - Senzor teploty a vlhkosti vzduchu
-* **JB přepínač s aretací** - Maintenance mód v otevření boxu
-* **Spínací tlačítko (Push button)** - Fyzický zásah do systému (Manual override)
+* **KY-025 Reed switch** - Maintenance mód - otevření boxu
+* **Spínací tlačítko (Push button)** - Fyzický zásah do systému (Manual override) !!!! TOHLE JE NĚJAKÝ DIVNÝ
 
 ### ⚙️ Akční členy (Výstupy)
-* **120mm Větrák Cooler Master** (Aktivní odvětrávání)
+* **120mm Cooler Master větríl** (Aktivní odvětrávání)
 * **Servo motor SM-S2309S** (Mechanická klapka)
 * **RGB LED pásek (3M)** (Osvětlení pro růst rostliny)
 * **Piezo Bzučák** (Akustická signalizace)
@@ -42,14 +38,14 @@ Projekt je sestaven převážně z recyklovaných a běžně dostupných elektro
 
 ### 🔌 Silová a propojovací elektronika
 * **MOSFET IRF520** (Spínání 12V větve pro ventilátor)
-* **Relé modul SRD-05VDC-SL-C** (Spínání 12V větve pro LED pásek)
+* **Relé modul SRD-05VDC-SL-C** (Spínání 12V větve pro LED pásek - ale ten podle mě nepotřebuje 12V. nějak zjistit)
 * **Potenciometr Bochen 3296** (Řízení kontrastu LCD displeje)
-* **Breadboard a propojky** (Stavebnice Boffin)
+* **Breadboard a propojky a kabely a duponty a hodně věcí**
 * **Externí napájecí adaptér 12V** (Pro napájení ventilátoru a osvětlení)
 
 ---
 
-## 🏗️ Architektura a Zapojení systému
+## 🏗️ Architektura a zapojení
 
 Systém využívá dvouúrovňovou architekturu:
 1. **Logická vrstva (5V/3.3V):** RPi a ESP32 řídí logiku. Senzory a LCD běží na této nízkonapěťové větvi. Data putují přes lokální Wi-Fi sít do Home Assistanta (protokol ESPHome API a MQTT).
@@ -57,7 +53,7 @@ Systém využívá dvouúrovňovou architekturu:
 
 ---
 
-## 📋 Implementační Plán
+## 📋 Implementační plán
 
 Vývoj projektu je rozdělen do 4 logických fází:
 
