@@ -1,8 +1,6 @@
-# 🌿 PlantGuardian IoT - Smart Grow Box
+# 🌿 PlantGuardian - Smart Grow Box
 
-**PlantGuardian** je školní IoT projekt (případová studie) pro dvoučlenný tým. Jedná se o chytrý, autonomní box pro dohled a péči o rostlinu/skleník. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů.
-
-Cílem projektu je demonstrovat reálné nasazení IoT technologií s důrazem na minimalizaci cloudových závislostí a maximální lokální bezpečnost.
+Jedná se o chytrý, autonomní box pro dohled a péči o rostlinu/skleník. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů.
 
 ---
 
@@ -89,13 +87,3 @@ Vývoj projektu je rozdělen do 4 logických fází:
 - [ ] Zabalení a montáž do finální fyzické krabice.
 
 ---
-
-## 🎯 Plnění školního zadání (Hodnocení)
-
-Tento projekt byl navržen tak, aby přesně splňoval požadavky pro **N = 2** (dvoučlenný tým):
-
-* **Lokální integrace (Min. 1):** Projekt využívá minimálně 3 (ESPHome, MQTT, Generic Camera).
-* **Počet scénářů (Min. 2):** Projekt obsahuje 3 ucelené scénáře (Chlazení, Závlaha, Bezpečnost).
-* **Počet entit (Min. 4):** Systém exportuje 8+ entit (Teplota, Vlhkost, Otáčky větráku, Úhel serva, Stav víka, Tlačítko, Bzučák, Relé světla).
-* **Dashboard a monitoring:** Webový klient vytvořen na míru, připojen lokálně s TLS zabezpečením.
-* **Absence Cloud API:** Veškerá logika a komunikace je přísně lokální (No-Cloud approach).****
