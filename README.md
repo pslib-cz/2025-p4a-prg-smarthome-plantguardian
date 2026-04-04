@@ -62,7 +62,7 @@ Systém využívá dvouúrovňovou architekturu:
 Vývoj projektu je rozdělen do 4 logických fází:
 
 ### Fáze 1: Založení infrastruktury
-- [ ] Instalace Home Assistant OS na Raspberry Pi.
+- [x] Instalace Home Assistant OS na Raspberry Pi.
 - [ ] Zprovoznění lokální Wi-Fi komunikace.
 - [ ] Instalace doplňků: Mosquitto broker (MQTT), ESPHome, File editor.
 - [ ] Integrace USB kamery přes *Generic Camera* integraci.
