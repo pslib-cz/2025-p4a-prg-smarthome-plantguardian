@@ -30,7 +30,7 @@ Projekt je sestaven převážně z recyklovaných a běžně dostupných elektro
 
 ### 📡 Senzory (Vstupy)
 * **DHT22** - Senzor teploty a vlhkosti vzduchu
-* **Omron mikrospínač** - Detekce otevření boxu
+* **JB přepínač s aretací** - Maintenance mód v otevření boxu
 * **Spínací tlačítko (Push button)** - Fyzický zásah do systému (Manual override)
 
 ### ⚙️ Akční členy (Výstupy)
@@ -69,7 +69,7 @@ Vývoj projektu je rozdělen do 4 logických fází:
 
 ### Fáze 2: Sběr dat a nízkonapěťové obvody
 - [ ] Zapojení a konfigurace ESP32 na breadboardu.
-- [ ] Připojení DHT22, Omron spínače a tlačítka JB k ESP32.
+- [ ] Připojení DHT22, JB spínače a tlačítka JB k ESP32.
 - [ ] Zápis `yaml` kódu do ESPHome a ověření čtení hodnot v HA.
 - [ ] Zapojení a konfigurace Piezo bzučáku pro alarm.
 
