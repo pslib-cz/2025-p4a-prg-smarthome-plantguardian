@@ -1,0 +1,6 @@
+config/secrets.yaml
+config/.storage/
+config/.cache/
+config/home-assistant_v2.db*
+config/tts/
+*.log*
