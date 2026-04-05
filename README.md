@@ -157,7 +157,7 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 - [x] Připojení KY-025 reed switch modulu — detekce otevření víka
 - [x] Připojení flame sensoru, Hg spínače, light blocking modulu
 - [x] Připojení rotary encoderu a push buttonu
-- [ ] Konfigurace pasivního bzučáku (PWM tóny)
+- [x] Konfigurace pasivního bzučáku (PWM tóny)
 - [ ] Zápis ESPHome YAML a ověření všech entit v HA
 
 ### Fáze 3: Výkonová elektronika a akční členy
@@ -165,6 +165,7 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 - [ ] IRF520 + BC547B gate driver — PWM řízení ventilátoru
 - [ ] 2× BC547B — přímé spínání LED pásku (W1 + W2 kanály)
 - [ ] Servo motor — mechanická klapka
+- [ ] Konfigurace pasivního bzučáku NA EVEMTY (když KRADE KARBIČKA)
 - [ ] Konfigurace automatizací v HA (pravidla pro scénáře 1–4)
 
 ### Fáze 4: Dashboard, zabezpečení a finalizace
