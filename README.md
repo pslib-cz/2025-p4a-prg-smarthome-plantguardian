@@ -152,11 +152,11 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 - [x] Nastavení Git repozitáře
 
 ### Fáze 2: Senzory a nízkonapěťové obvody
-- [ ] Zapojení a konfigurace ESP32 na breadboardu
-- [ ] Připojení DHT22 — ověření čtení teploty a vlhkosti v HA
-- [ ] Připojení KY-025 reed switch modulu — detekce otevření víka
-- [ ] Připojení flame sensoru, Hg spínače, light blocking modulu
-- [ ] Připojení rotary encoderu a push buttonu
+- [x] Zapojení a konfigurace ESP32 na breadboardu
+- [x] Připojení DHT22 — ověření čtení teploty a vlhkosti v HA
+- [x] Připojení KY-025 reed switch modulu — detekce otevření víka
+- [x] Připojení flame sensoru, Hg spínače, light blocking modulu
+- [x] Připojení rotary encoderu a push buttonu
 - [ ] Konfigurace pasivního bzučáku (PWM tóny)
 - [ ] Zápis ESPHome YAML a ověření všech entit v HA
 
