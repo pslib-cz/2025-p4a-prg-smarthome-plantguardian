@@ -1,4 +1,4 @@
-# 🌿 PlantGuardian — Smart Grow Box
+# 🌿 PlantGuardian - Smart Grow Box
 
 Chytrý, autonomní box pro dohled a péči o rostlinu. Systém je plně lokální, běží na platformě Home Assistant a využívá mikrokontrolér ESP32 ke čtení ze senzorů a řízení akčních členů. Komunikace probíhá přes ESPHome API a MQTT; webový klient (dashboard) se připojuje přes MQTT WebSockets se zabezpečením TLS/SSL.
 ###### ANTONÍN REISER, ŠTĚPÁN PRCHAL
