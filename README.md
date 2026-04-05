@@ -109,6 +109,7 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 
 **Výkonová vrstva (12V):** Oddělený napájecí okruh pro ventilátor. BC547B slouží jako gate driver pro IRF520 MOSFET (ESP32 GPIO dává 3.3V, IRF520 potřebuje ~10V na gate). Obě vrstvy sdílejí společnou zem.
 
+> Podrobné schéma zapojení všech komponent včetně GPIO pinoutu a postupu oživování: [WIRING.md](WIRING-GUIDE.md)
 ---
 
 ## 📊 Přehled entit a integrací
