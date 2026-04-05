@@ -1,0 +1,32 @@
+esphome:
+  name: plantguardian
+  friendly_name: PlantGuardian
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "D8eQzWcW5wzGDbKKs6xkZ4OxU9ozQZBxXtudwA57cJc="
+
+ota:
+  - platform: esphome
+    password: "6b3405a0753ff68d442b7ea4f5c31445"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Plantguardian Fallback Hotspot"
+    password: "k2ObL3cNaQQs"
+
+captive_portal:
+    
