@@ -44,7 +44,7 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 | **DHT22** | Teplota a vlhkost vzduchu | Digitální (GPIO) |
 | **KY-025 Reed Switch modul** | Detekce otevření víka boxu | Digitální (D0 → GPIO) |
 | **Flame sensor modul** | Detekce ohně / plamene | Digitální (D0 → GPIO) |
-| **Rtuťový nakláněcí spínač** | Detekce převrácení boxu | Digitální (GPIO) |
+| **tilt switch** | Detekce převrácení boxu | Digitální (GPIO) |
 | **[Light blocking modul](https://www.circuitmagic.com/arduino/light-blocking-module-with-arduino-step-by-step-guide/)** | Měření intenzity světla | Digitální |
 | **Rotary encoder** | Fyzické nastavení teplotního prahu | Digitální (GPIO — CLK, DT, SW) |
 | **Push button** | Manual override / servisní režim | Digitální (GPIO) |
