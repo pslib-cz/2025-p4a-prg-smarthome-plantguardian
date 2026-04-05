@@ -64,8 +64,9 @@ Systém používá **dva oddělené napájecí zdroje** se společnou zemí (GND
 | GPIO32 | LED pásek W2 (→ BC547B) | PWM | Přímé spínání, 5V |
 | GPIO33 | Pasivní bzučák | PWM | Různé frekvence = různé tóny |
 | GPIO18 | Servo SM-S2309S (signal) | PWM | 50 Hz, 1–2 ms pulz |
-| GPIO21 | LCD displej (SDA) | I²C | Vyžaduje I²C backpack (PCF8574) |
-| GPIO22 | LCD displej (SCL) | I²C | Vyžaduje I²C backpack (PCF8574) |
+| GPIO19 | 74HC595N (DS — data) | Digitální | Shift register pro LCD |
+| GPIO23 | 74HC595N (SH_CP — clock) | Digitální | Shift register pro LCD |
+| GPIO15 | 74HC595N (ST_CP — latch) | Digitální | Shift register pro LCD |
 
 ---
 
@@ -289,48 +290,80 @@ Dva nezávislé kanály, každý přes vlastní BC547B. Odběr ~3 mA/kanál.
 
 ---
 
-### 12. LCD displej LCM1602C — Lokální status
+### 12. LCD displej LCM1602C — přes 74HC595N shift register
 
-**Doporučení: Použij I²C backpack (PCF8574)**. Bez něj LCD zabere 6+ GPIO pinů. S I²C backpackem jen 2:
+Shift register 74HC595N převádí 3 GPIO piny na 6+ výstupů pro LCD. Šetří piny a vyhýbá se boot-citlivým GPIO.
 
 ```
-  LCD + I²C backpack (PCF8574)
-  ┌────────────┐
-  │ GND ──→ GND
-  │ VCC ──→ 5V
-  │ SDA ──→ GPIO21
-  │ SCL ──→ GPIO22
-  └────────────┘
-
-  Bochen 3296 potenciometr:
-  Připájený na backpacku (kontrast) — nebo přímo na LCD V0 pinu
+  ESP32                  74HC595N                      LCD (LCM1602C)
+  ┌──────┐              ┌──────────────┐              ┌──────────────┐
+  │GPIO19├──→ pin 14 DS │              │              │              │
+  │GPIO23├──→ pin 11 SH │  Q0 (pin 15) ├──→───────────┤ RS           │
+  │GPIO15├──→ pin 12 ST │  Q1 (pin 1)  ├──→───────────┤ E            │
+  │      │              │  Q2 (pin 2)  ├──→───────────┤ D4           │
+  │ 3.3V ├──→ pin 16 VCC│  Q3 (pin 3)  ├──→───────────┤ D5           │
+  │ 3.3V ├──→ pin 10 MR │  Q4 (pin 4)  ├──→───────────┤ D6           │
+  │  GND ├──→ pin 8 GND │  Q5 (pin 5)  ├──→───────────┤ D7           │
+  │  GND ├──→ pin 13 OE │              │              │              │
+  └──────┘              └──────────────┘              │ VSS ──→ GND  │
+                                                      │ VDD ──→ 5V   │
+                                                      │ RW  ──→ GND  │
+                                                      │ V0  ──→ Bochen│
+                                                      │ A   ──→ 5V(220Ω)
+                                                      │ K   ──→ GND  │
+                                                      └──────────────┘
 ```
 
-**Bez I²C backpacku (paralelní režim):**
+**74HC595N zapojení (DIP-16 pouzdro):**
+
+| Pin | Název | Připojení |
+|-----|-------|-----------|
+| 8 | GND | GND |
+| 10 | MR (master reset) | 3.3V (trvale HIGH = nikdy neresetovat) |
+| 11 | SH_CP (shift clock) | ESP32 GPIO23 |
+| 12 | ST_CP (latch clock) | ESP32 GPIO15 |
+| 13 | OE (output enable) | GND (trvale LOW = výstupy vždy aktivní) |
+| 14 | DS (serial data) | ESP32 GPIO19 |
+| 15 | Q0 | LCD RS |
+| 16 | VCC | 3.3V |
+| 1 | Q1 | LCD E |
+| 2 | Q2 | LCD D4 |
+| 3 | Q3 | LCD D5 |
+| 4 | Q4 | LCD D6 |
+| 5 | Q5 | LCD D7 |
+| 6–7 | Q6, Q7 | Nevyužito |
+| 9 | Q7' | Nevyužito (sériový výstup pro řetězení) |
+
+**LCD piny:**
 
 | LCD pin | Připojení |
 |---------|-----------|
 | VSS | GND |
 | VDD | 5V |
 | V0 | Bochen 3296 střední pin (kontrast) |
-| RS | GPIO19 |
+| RS | 74HC595N Q0 |
 | RW | GND |
-| E | GPIO23 |
-| D4 | GPIO15 |
-| D5 | GPIO2 |
-| D6 | GPIO0 |
-| D7 | GPIO12 |
+| E | 74HC595N Q1 |
+| D4 | 74HC595N Q2 |
+| D5 | 74HC595N Q3 |
+| D6 | 74HC595N Q4 |
+| D7 | 74HC595N Q5 |
 | A (backlight) | 5V přes 220Ω |
 | K (backlight) | GND |
 
-⚠️ Paralelní režim zabere 6 GPIO pinů a některé (GPIO0, GPIO2, GPIO12) jsou citlivé na boot — **důrazně doporučuji I²C backpack**.
-
-Bochen 3296 potenciometr zapojení (pro kontrast):
+**Bochen 3296 potenciometr** (kontrast LCD):
 ```
-  5V ──→ pin 1 (krajní)
+  5V  ──→ pin 1 (krajní)
   GND ──→ pin 3 (krajní)
   pin 2 (střední / wiper) ──→ LCD V0
 ```
+
+**Napětí:**
+- 74HC595N napájený z **3.3V** — rozpozná 3.3V signály z ESP32
+- LCD napájený z **5V** — ale přijímá 3.3V logiku (HD44780 VIH min = 2.2V)
+- Toto zapojení funguje spolehlivě bez převodníků úrovní
+
+⚠️ V ESPHome se 74HC595N konfiguruje přes platformu `sn74hc595` — nativní podpora, žádné externí knihovny
 
 ---
 
@@ -342,7 +375,7 @@ Bochen 3296 potenciometr zapojení (pro kontrast):
 | 10kΩ | 1× | Pull-up gate IRF520 na 12V |
 | 4.7kΩ | 1× | Pull-up DHT22 DATA na 3.3V |
 | 100Ω | 1× | Omezení proudu bzučáku |
-| 220Ω | 1× | Backlight LCD (pokud bez I²C backpacku) |
+| 220Ω | 1× | Backlight LCD displeje |
 
 ---
 
