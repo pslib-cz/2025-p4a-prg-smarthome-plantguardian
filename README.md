@@ -56,7 +56,7 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 | **Servo motor SM-S2309S** | Mechanická klapka / ventil | PWM signál (5V) |
 | **Dual White (CCT) LED pásek (5V)** | Osvětlení pro růst rostliny (teplá + studená bílá) | 2× BC547B, PWM (5V) |
 | **Pasivní bzučák** | Akustická signalizace (více tónů) | PWM (3.3V) |
-| **LCD displej LCM1602C** | Lokální zobrazení stavu a varování | I²C / paralelně (5V) |
+| **LCD displej LCM1602C** | Lokální zobrazení stavu a varování | 74HC595N shift register (3 GPIO) |
 
 ### 🔌 Silová a propojovací elektronika
 | Komponenta | Funkce |
@@ -66,6 +66,7 @@ Dva kanály (W1, W2) umožňují přizpůsobit barvu světla fázi růstu rostli
 | **Potenciometr Bochen 3296** | Nastavení kontrastu LCD displeje |
 | **Breadboard, propojky, DuPont kabely** | Prototypové zapojení |
 | **Externí napájecí adaptér 12V** | Napájení ventilátoru |
+| **74HC595N shift register** | Rozšíření GPIO pro LCD displej (3 piny → 6 výstupů) |
 
 ---
 
